@@ -172,7 +172,7 @@
             <div class="bg-white rounded-lg shadow-md overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full">
-                        <thead class="bg-gradient-to-r from-green-600 to-yellow-500 text-white">
+                        <thead class="bg-gradient-to-r from-green-600 to-yellow-500 text-black">
                             <tr>
                                 <th class="px-4 py-3 text-left text-sm font-semibold">File Name</th>
                                 <th class="px-4 py-3 text-left text-sm font-semibold">Type</th>
