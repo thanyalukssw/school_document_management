@@ -172,7 +172,7 @@
             <div class="bg-white rounded-lg shadow-md overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full">
-                        <thead class="bg-gradient-to-r from-green-600 to-yellow-500 text-Black">
+                        <thead class="bg-gradient-to-r from-green-600 to-yellow-500 text-black">
                             <tr>
                                 <th class="px-4 py-3 text-left text-sm font-semibold">File Name</th>
                                 <th class="px-4 py-3 text-left text-sm font-semibold">Type</th>
@@ -272,12 +272,80 @@
         </div>
     </div>
 
+    <!-- Resubmit Modal -->
+    <div id="resubmitModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <h3 class="text-xl font-bold text-gray-900 mb-4">Resubmit File</h3>
+
+            <div class="mb-4 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                <p class="text-sm font-semibold text-orange-800 mb-1">Missing Information:</p>
+                <p class="text-sm text-orange-700" id="resubmitNote"></p>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">File Name *</label>
+                    <input type="text" id="resubmitFileName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" required>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">File Type *</label>
+                    <select id="resubmitFileType" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        <option value="Billing">Billing</option>
+                        <option value="Paper">Paper</option>
+                        <option value="Approval">Approval</option>
+                        <option value="Leave Request">Leave Request</option>
+                        <option value="Purchase Order">Purchase Order</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea id="resubmitDescription" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Update Attached File (Optional)</label>
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-orange-500 transition">
+                        <input type="file" id="resubmitFileInput" class="hidden" onchange="handleResubmitFileSelect(this)">
+                        <button type="button" onclick="document.getElementById('resubmitFileInput').click()" class="text-orange-600 hover:text-orange-700 font-medium">
+                            <svg class="w-8 h-8 mx-auto mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                            Click to upload new file
+                        </button>
+                        <p class="text-xs text-gray-500 mt-1">PDF, DOC, DOCX, XLS, XLSX, JPG, PNG (Max 5MB)</p>
+                        <div id="resubmitSelectedFileName" class="mt-2 text-sm text-orange-600 font-medium"></div>
+                        <div id="resubmitCurrentFile" class="mt-2 text-xs text-gray-500"></div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Comment (Optional)</label>
+                    <textarea id="resubmitComment" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="Explain what you've fixed or updated..."></textarea>
+                </div>
+
+                <div class="flex gap-3 pt-2">
+                    <button onclick="hideResubmitModal()" class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
+                        Cancel
+                    </button>
+                    <button onclick="handleResubmit()" class="flex-1 px-4 py-2 bg-gradient-to-r from-orange-600 to-red-500 text-white rounded-lg hover:from-orange-700 hover:to-red-600 transition shadow-md">
+                        Resubmit
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Global state
         let currentUser = null;
         let files = [];
         let selectedFile = null;
         let currentFileIdForNote = null;
+        let currentFileIdForResubmit = null;
+        let resubmitFile = null;
 
         // Status configuration
         const statusConfig = {
@@ -444,6 +512,129 @@
             }
         }
 
+        // Show resubmit modal
+        function showResubmitModal(fileId) {
+            const file = files.find(f => f.id === fileId);
+            if (!file) return;
+
+            currentFileIdForResubmit = fileId;
+            resubmitFile = null;
+
+            // Pre-fill with existing data
+            document.getElementById('resubmitFileName').value = file.fileName;
+            document.getElementById('resubmitFileType').value = file.fileType;
+            document.getElementById('resubmitDescription').value = file.description || '';
+            document.getElementById('resubmitNote').textContent = file.statusNote || 'No note provided';
+            document.getElementById('resubmitComment').value = '';
+            document.getElementById('resubmitFileInput').value = '';
+            document.getElementById('resubmitSelectedFileName').textContent = '';
+            
+            // Show current file if exists
+            if (file.attachedFile) {
+                document.getElementById('resubmitCurrentFile').textContent = `Current file: ${file.attachedFile.name}`;
+            } else {
+                document.getElementById('resubmitCurrentFile').textContent = '';
+            }
+
+            document.getElementById('resubmitModal').classList.remove('hidden');
+        }
+
+        // Hide resubmit modal
+        function hideResubmitModal() {
+            document.getElementById('resubmitModal').classList.add('hidden');
+            currentFileIdForResubmit = null;
+            resubmitFile = null;
+        }
+
+        // Handle resubmit file selection
+        function handleResubmitFileSelect(input) {
+            const file = input.files[0];
+            if (!file) {
+                resubmitFile = null;
+                document.getElementById('resubmitSelectedFileName').textContent = '';
+                return;
+            }
+
+            // Validate file size (5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('File size must be less than 5MB');
+                input.value = '';
+                return;
+            }
+
+            // Validate file type
+            const allowedTypes = [
+                'application/pdf',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'application/vnd.ms-excel',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'image/jpeg',
+                'image/png'
+            ];
+
+            if (!allowedTypes.includes(file.type)) {
+                alert('Only PDF, DOC, DOCX, XLS, XLSX, JPG, PNG files are allowed');
+                input.value = '';
+                return;
+            }
+
+            // Read file as base64
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                resubmitFile = {
+                    name: file.name,
+                    type: file.type,
+                    size: file.size,
+                    data: e.target.result
+                };
+                document.getElementById('resubmitSelectedFileName').textContent = `✓ New file: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Handle resubmit
+        function handleResubmit() {
+            const fileName = document.getElementById('resubmitFileName').value;
+            const fileType = document.getElementById('resubmitFileType').value;
+            const description = document.getElementById('resubmitDescription').value;
+            const comment = document.getElementById('resubmitComment').value;
+
+            if (!fileName) {
+                alert('Please enter a file name');
+                return;
+            }
+
+            const fileIndex = files.findIndex(f => f.id === currentFileIdForResubmit);
+            if (fileIndex !== -1) {
+                // Update file information
+                files[fileIndex].fileName = fileName;
+                files[fileIndex].fileType = fileType;
+                files[fileIndex].description = description;
+                
+                // Update attached file if new one is provided
+                if (resubmitFile) {
+                    files[fileIndex].attachedFile = resubmitFile;
+                }
+                
+                // Update status to in_process
+                files[fileIndex].status = 'in_process';
+                files[fileIndex].statusNote = null; // Clear the missing info note
+                
+                // Add to history
+                files[fileIndex].statusHistory.push({
+                    status: 'in_process',
+                    timestamp: new Date().toISOString(),
+                    updatedBy: currentUser.username,
+                    action: 'resubmit',
+                    comment: comment || 'File resubmitted after missing info'
+                });
+
+                saveFiles();
+                hideResubmitModal();
+            }
+        }
+
         // Handle status change
         function handleStatusChange(fileId, newStatus) {
             if (newStatus === 'missing') {
@@ -594,6 +785,14 @@
                             <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium text-white ${status.color}">
                                 ${status.icon} ${status.label}
                             </span>
+                            ${file.status === 'missing' && file.uploadedBy === currentUser.username ? `
+                                <button onclick="showResubmitModal(${file.id})" class="mt-2 w-full text-xs px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition flex items-center justify-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                    </svg>
+                                    Resubmit
+                                </button>
+                            ` : ''}
                         </td>
                         <td class="px-4 py-3">
                             <div class="text-sm">
