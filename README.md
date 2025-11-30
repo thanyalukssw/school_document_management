@@ -149,14 +149,16 @@
                         <option value="missing">Missing Info</option>
                     </select>
 
+                    <select id="departmentFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <option value="all">All Departments</option>
+                        <option value="Academic Affairs Department">Academic Affairs</option>
+                        <option value="HR and Student Affairs Department">HR & Student Affairs</option>
+                        <option value="General Administration Department">General Administration</option>
+                        <option value="Budgeting and Finance Department">Budgeting & Finance</option>
+                    </select>
+
                     <select id="typeFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
                         <option value="all">All Types</option>
-                        <option value="Maintenance">Maintenance</option>
-                        <option value="Paper">Paper</option>
-                        <option value="Approval">Approval</option>
-                        <option value="Leave Request">Leave Request</option>
-                        <option value="Purchase Order">Purchase Order</option>
-                        <option value="Other">Other</option>
                     </select>
 
                     <button onclick="showUploadModal()" class="flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-green-600 to-yellow-500 text-white rounded-lg hover:from-green-700 hover:to-yellow-600 transition shadow-md">
@@ -175,6 +177,7 @@
                         <thead class="bg-gradient-to-r from-green-600 to-yellow-500 text-black">
                             <tr>
                                 <th class="px-4 py-3 text-left text-sm font-semibold">File Name</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold">Department</th>
                                 <th class="px-4 py-3 text-left text-sm font-semibold">Type</th>
                                 <th class="px-4 py-3 text-left text-sm font-semibold">Uploaded By</th>
                                 <th class="px-4 py-3 text-left text-sm font-semibold">Upload Date</th>
@@ -185,7 +188,7 @@
                         </thead>
                         <tbody id="filesTableBody" class="divide-y divide-gray-200">
                             <tr>
-                                <td colspan="7" class="px-4 py-8 text-center text-gray-500">No files found</td>
+                                <td colspan="8" class="px-4 py-8 text-center text-gray-500">No files found</td>
                             </tr>
                         </tbody>
                     </table>
@@ -201,20 +204,26 @@
 
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">File Name *</label>
-                    <input type="text" id="uploadFileName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Department *</label>
+                    <select id="uploadDepartment" onchange="updateFileTypeOptions()" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <option value="">-- Select Department --</option>
+                        <option value="Academic Affairs Department">Academic Affairs Department</option>
+                        <option value="HR and Student Affairs Department">HR and Student Affairs Department</option>
+                        <option value="General Administration Department">General Administration Department</option>
+                        <option value="Budgeting and Finance Department">Budgeting and Finance Department</option>
+                    </select>
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">File Type *</label>
                     <select id="uploadFileType" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
-                        <option value="Maintenance">Maintenance</option>
-                        <option value="Paper">Paper</option>
-                        <option value="Approval">Approval</option>
-                        <option value="Leave Request">Leave Request</option>
-                        <option value="Purchase Order">Purchase Order</option>
-                        <option value="Other">Other</option>
+                        <option value="">-- Select Type --</option>
                     </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">File Name *</label>
+                    <input type="text" id="uploadFileName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
                 </div>
 
                 <div>
@@ -284,20 +293,26 @@
 
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">File Name *</label>
-                    <input type="text" id="resubmitFileName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" required>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Department *</label>
+                    <select id="resubmitDepartment" onchange="updateResubmitFileTypeOptions()" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        <option value="">-- Select Department --</option>
+                        <option value="Academic Affairs Department">Academic Affairs Department</option>
+                        <option value="HR and Student Affairs Department">HR and Student Affairs Department</option>
+                        <option value="General Administration Department">General Administration Department</option>
+                        <option value="Budgeting and Finance Department">Budgeting and Finance Department</option>
+                    </select>
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">File Type *</label>
                     <select id="resubmitFileType" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
-                        <option value="Maintenance">Maintenance</option>
-                        <option value="Paper">Paper</option>
-                        <option value="Approval">Approval</option>
-                        <option value="Leave Request">Leave Request</option>
-                        <option value="Purchase Order">Purchase Order</option>
-                        <option value="Other">Other</option>
+                        <option value="">-- Select Type --</option>
                     </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">File Name *</label>
+                    <input type="text" id="resubmitFileName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" required>
                 </div>
 
                 <div>
@@ -347,6 +362,26 @@
         let currentFileIdForResubmit = null;
         let resubmitFile = null;
 
+        // Department and file type mapping
+        const departmentFileTypes = {
+            'Academic Affairs Department': [
+                'swap periods',
+                'teaching materials',
+                'research submission'
+            ],
+            'HR and Student Affairs Department': [
+                'leave request',
+                'request submission'
+            ],
+            'General Administration Department': [
+                'maintenance',
+                'request submission'
+            ],
+            'Budgeting and Finance Department': [
+                'supply request'
+            ]
+        };
+
         // Status configuration
         const statusConfig = {
             in_process: { label: 'In Process', color: 'bg-yellow-500', icon: '🕐' },
@@ -379,11 +414,17 @@
             const isAdmin = document.getElementById('loginIsAdmin').checked;
 
             if (username && password.length >= 4) {
-                currentUser = { username, isAdmin };
+                // Get admin department if admin
+                let adminDepartment = null;
+                if (isAdmin) {
+                    adminDepartment = prompt('Enter your department:\n1. Academic Affairs Department\n2. HR and Student Affairs Department\n3. General Administration Department\n4. Budgeting and Finance Department');
+                }
+
+                currentUser = { username, isAdmin, department: adminDepartment };
                 document.getElementById('loginModal').classList.add('hidden');
                 document.getElementById('mainApp').classList.remove('hidden');
                 document.getElementById('currentUsername').textContent = username;
-                document.getElementById('currentUserRole').textContent = isAdmin ? 'Administrator' : 'User';
+                document.getElementById('currentUserRole').textContent = isAdmin ? `Administrator (${adminDepartment})` : 'User';
                 
                 if (isAdmin) {
                     document.getElementById('actionsHeader').classList.remove('hidden');
@@ -409,11 +450,30 @@
         // Show upload modal
         function showUploadModal() {
             document.getElementById('uploadModal').classList.remove('hidden');
+            document.getElementById('uploadDepartment').value = '';
+            document.getElementById('uploadFileType').innerHTML = '<option value="">-- Select Type --</option>';
             document.getElementById('uploadFileName').value = '';
             document.getElementById('uploadDescription').value = '';
             document.getElementById('uploadFileInput').value = '';
             document.getElementById('selectedFileName').textContent = '';
             selectedFile = null;
+        }
+
+        // Update file type options based on department
+        function updateFileTypeOptions() {
+            const department = document.getElementById('uploadDepartment').value;
+            const fileTypeSelect = document.getElementById('uploadFileType');
+            
+            fileTypeSelect.innerHTML = '<option value="">-- Select Type --</option>';
+            
+            if (department && departmentFileTypes[department]) {
+                departmentFileTypes[department].forEach(type => {
+                    const option = document.createElement('option');
+                    option.value = type;
+                    option.textContent = type;
+                    fileTypeSelect.appendChild(option);
+                });
+            }
         }
 
         // Hide upload modal
@@ -471,9 +531,20 @@
 
         // Handle file upload
         function handleUpload() {
-            const fileName = document.getElementById('uploadFileName').value;
+            const department = document.getElementById('uploadDepartment').value;
             const fileType = document.getElementById('uploadFileType').value;
+            const fileName = document.getElementById('uploadFileName').value;
             const description = document.getElementById('uploadDescription').value;
+
+            if (!department) {
+                alert('Please select a department');
+                return;
+            }
+
+            if (!fileType) {
+                alert('Please select a file type');
+                return;
+            }
 
             if (!fileName) {
                 alert('Please enter a file name');
@@ -482,8 +553,9 @@
 
             const newFile = {
                 id: Date.now(),
-                fileName: fileName,
+                department: department,
                 fileType: fileType,
+                fileName: fileName,
                 description: description,
                 uploadedBy: currentUser.username,
                 uploadedAt: new Date().toISOString(),
@@ -521,8 +593,10 @@
             resubmitFile = null;
 
             // Pre-fill with existing data
-            document.getElementById('resubmitFileName').value = file.fileName;
+            document.getElementById('resubmitDepartment').value = file.department;
+            updateResubmitFileTypeOptions();
             document.getElementById('resubmitFileType').value = file.fileType;
+            document.getElementById('resubmitFileName').value = file.fileName;
             document.getElementById('resubmitDescription').value = file.description || '';
             document.getElementById('resubmitNote').textContent = file.statusNote || 'No note provided';
             document.getElementById('resubmitComment').value = '';
@@ -537,6 +611,23 @@
             }
 
             document.getElementById('resubmitModal').classList.remove('hidden');
+        }
+
+        // Update resubmit file type options
+        function updateResubmitFileTypeOptions() {
+            const department = document.getElementById('resubmitDepartment').value;
+            const fileTypeSelect = document.getElementById('resubmitFileType');
+            
+            fileTypeSelect.innerHTML = '<option value="">-- Select Type --</option>';
+            
+            if (department && departmentFileTypes[department]) {
+                departmentFileTypes[department].forEach(type => {
+                    const option = document.createElement('option');
+                    option.value = type;
+                    option.textContent = type;
+                    fileTypeSelect.appendChild(option);
+                });
+            }
         }
 
         // Hide resubmit modal
@@ -595,10 +686,21 @@
 
         // Handle resubmit
         function handleResubmit() {
-            const fileName = document.getElementById('resubmitFileName').value;
+            const department = document.getElementById('resubmitDepartment').value;
             const fileType = document.getElementById('resubmitFileType').value;
+            const fileName = document.getElementById('resubmitFileName').value;
             const description = document.getElementById('resubmitDescription').value;
             const comment = document.getElementById('resubmitComment').value;
+
+            if (!department) {
+                alert('Please select a department');
+                return;
+            }
+
+            if (!fileType) {
+                alert('Please select a file type');
+                return;
+            }
 
             if (!fileName) {
                 alert('Please enter a file name');
@@ -608,8 +710,9 @@
             const fileIndex = files.findIndex(f => f.id === currentFileIdForResubmit);
             if (fileIndex !== -1) {
                 // Update file information
-                files[fileIndex].fileName = fileName;
+                files[fileIndex].department = department;
                 files[fileIndex].fileType = fileType;
+                files[fileIndex].fileName = fileName;
                 files[fileIndex].description = description;
                 
                 // Update attached file if new one is provided
@@ -699,6 +802,7 @@
         function renderFiles() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             const statusFilter = document.getElementById('statusFilter').value;
+            const departmentFilter = document.getElementById('departmentFilter').value;
             const typeFilter = document.getElementById('typeFilter').value;
             
             let filtered = files;
@@ -708,11 +812,17 @@
                 filtered = filtered.filter(f => f.uploadedBy === currentUser.username);
             }
 
+            // Filter by admin department (admins only see files from their department)
+            if (currentUser && currentUser.isAdmin && currentUser.department) {
+                filtered = filtered.filter(f => f.department === currentUser.department);
+            }
+
             // Filter by search term
             if (searchTerm) {
                 filtered = filtered.filter(f => 
                     f.fileName.toLowerCase().includes(searchTerm) ||
                     f.fileType.toLowerCase().includes(searchTerm) ||
+                    f.department.toLowerCase().includes(searchTerm) ||
                     f.uploadedBy.toLowerCase().includes(searchTerm)
                 );
             }
@@ -722,15 +832,23 @@
                 filtered = filtered.filter(f => f.status === statusFilter);
             }
 
+            // Filter by department
+            if (departmentFilter !== 'all') {
+                filtered = filtered.filter(f => f.department === departmentFilter);
+            }
+
             // Filter by type
             if (typeFilter !== 'all') {
                 filtered = filtered.filter(f => f.fileType === typeFilter);
             }
 
+            // Update type filter options based on current filters
+            updateTypeFilterOptions();
+
             const tbody = document.getElementById('filesTableBody');
             
             if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="${currentUser?.isAdmin ? 7 : 6}" class="px-4 py-8 text-center text-gray-500">No files found</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="${currentUser?.isAdmin ? 8 : 7}" class="px-4 py-8 text-center text-gray-500">No files found</td></tr>`;
                 return;
             }
 
@@ -757,7 +875,7 @@
                         <td class="px-4 py-3">
                             <div>
                                 <p class="font-medium text-gray-900">${file.fileName}</p>
-                                <p class="text-sm text-gray-500">${file.description || ''}</p>
+                                <p class="text-sm text-gray-600">${file.description || ''}</p>
                                 ${file.attachedFile ? `
                                     <button onclick="downloadFile(${file.id})" class="text-xs text-blue-600 hover:text-blue-800 mt-1 flex items-center gap-1">
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -775,12 +893,17 @@
                             </div>
                         </td>
                         <td class="px-4 py-3">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                ${file.department.replace(' Department', '')}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3">
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                 ${file.fileType}
                             </span>
                         </td>
-                        <td class="px-4 py-3 text-sm text-gray-600">${file.uploadedBy}</td>
-                        <td class="px-4 py-3 text-sm text-gray-600">${formatDate(file.uploadedAt)}</td>
+                        <td class="px-4 py-3 text-sm text-gray-900">${file.uploadedBy}</td>
+                        <td class="px-4 py-3 text-sm text-gray-900">${formatDate(file.uploadedAt)}</td>
                         <td class="px-4 py-3">
                             <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium text-white ${status.color}">
                                 ${status.icon} ${status.label}
@@ -796,14 +919,46 @@
                         </td>
                         <td class="px-4 py-3">
                             <div class="text-sm">
-                                <p class="text-gray-600">${lastUpdateTime}</p>
-                                <p class="text-xs text-gray-500">by ${lastUpdateBy}</p>
+                                <p class="text-gray-900">${lastUpdateTime}</p>
+                                <p class="text-xs text-gray-600">by ${lastUpdateBy}</p>
                             </div>
                         </td>
                         ${statusSelect}
                     </tr>
                 `;
             }).join('');
+        }
+
+        // Update type filter options based on selected department
+        function updateTypeFilterOptions() {
+            const departmentFilter = document.getElementById('departmentFilter').value;
+            const typeFilterSelect = document.getElementById('typeFilter');
+            const currentValue = typeFilterSelect.value;
+            
+            typeFilterSelect.innerHTML = '<option value="all">All Types</option>';
+            
+            if (departmentFilter !== 'all' && departmentFileTypes[departmentFilter]) {
+                departmentFileTypes[departmentFilter].forEach(type => {
+                    const option = document.createElement('option');
+                    option.value = type;
+                    option.textContent = type;
+                    typeFilterSelect.appendChild(option);
+                });
+                typeFilterSelect.value = currentValue;
+            } else if (departmentFilter === 'all') {
+                // Show all types from all departments
+                const allTypes = new Set();
+                Object.values(departmentFileTypes).forEach(types => {
+                    types.forEach(type => allTypes.add(type));
+                });
+                allTypes.forEach(type => {
+                    const option = document.createElement('option');
+                    option.value = type;
+                    option.textContent = type;
+                    typeFilterSelect.appendChild(option);
+                });
+                typeFilterSelect.value = currentValue;
+            }
         }
 
         // Update statistics
@@ -821,6 +976,7 @@
         // Event listeners
         document.getElementById('searchInput').addEventListener('input', renderFiles);
         document.getElementById('statusFilter').addEventListener('change', renderFiles);
+        document.getElementById('departmentFilter').addEventListener('change', renderFiles);
         document.getElementById('typeFilter').addEventListener('change', renderFiles);
     </script>
 </body>
