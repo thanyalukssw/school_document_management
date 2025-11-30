@@ -2,7 +2,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DS e-Office Tracking System</title>
+    <title>DS e-Office Management System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
@@ -18,7 +18,7 @@
                 <svg class="w-16 h-16 mx-auto text-green-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                 </svg>
-                <h2 class="text-2xl font-bold text-gray-900">DS e-Office Tracking</h2>
+                <h2 class="text-2xl font-bold text-gray-900">DS e-Office Management</h2>
                 <p class="text-gray-600 mt-1">File Management System</p>
             </div>
 
@@ -84,7 +84,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                         </svg>
                         <div>
-                            <h1 class="text-2xl font-bold">DS e-Office Tracking</h1>
+                            <h1 class="text-2xl font-bold">DS e-Office Management</h1>
                             <p class="text-green-100 text-sm">File Management System</p>
                         </div>
                     </div>
@@ -400,6 +400,31 @@
         </div>
     </div>
 
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+            <div class="text-center">
+                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4">
+                    <svg class="h-10 w-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2">ยืนยันการลบเอกสาร</h3>
+                <p class="text-sm text-gray-600 mb-1">คุณต้องการลบเอกสารนี้หรือไม่?</p>
+                <p class="text-sm font-medium text-gray-900 mb-4" id="deleteFileName"></p>
+                <p class="text-xs text-red-600 mb-4">การลบจะไม่สามารถกู้คืนได้</p>
+                <div class="flex gap-3">
+                    <button onclick="hideDeleteModal()" class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
+                        ยกเลิก
+                    </button>
+                    <button onclick="deleteFile()" class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
+                        ลบเอกสาร
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Global state
         let currentUser = null;
@@ -408,24 +433,29 @@
         let currentFileIdForNote = null;
         let currentFileIdForResubmit = null;
         let resubmitFile = null;
+        let currentFileIdForDelete = null;
 
         // Department and file type mapping
         const departmentFileTypes = {
             'Academic Affairs Department': [
-                'swap periods',
-                'teaching materials',
-                'research submission'
+                'Swap periods',
+                'Teaching materials',
+                'Research submission',
+                'Others'
             ],
             'HR and Student Affairs Department': [
-                'leave request',
-                'request submission'
+                'Leave request',
+                'Request submission',
+                'Others'
             ],
             'General Administration Department': [
-                'maintenance',
-                'request submission'
+                'Maintenance',
+                'Request submission',
+                'Others'
             ],
             'Budgeting and Finance Department': [
-                'supply request'
+                'Supply request',
+                'Others'
             ]
         };
 
@@ -654,6 +684,35 @@
             renderFiles();
             updateStats();
             showSuccessModal('รีเฟรชข้อมูลเรียบร้อยแล้ว');
+        }
+
+        // Confirm delete file
+        function confirmDeleteFile(fileId) {
+            const file = files.find(f => f.id === fileId);
+            if (!file) return;
+
+            currentFileIdForDelete = fileId;
+            document.getElementById('deleteFileName').textContent = file.fileName;
+            document.getElementById('deleteModal').classList.remove('hidden');
+        }
+
+        // Hide delete modal
+        function hideDeleteModal() {
+            document.getElementById('deleteModal').classList.add('hidden');
+            currentFileIdForDelete = null;
+        }
+
+        // Delete file
+        function deleteFile() {
+            if (currentFileIdForDelete) {
+                const fileIndex = files.findIndex(f => f.id === currentFileIdForDelete);
+                if (fileIndex !== -1) {
+                    files.splice(fileIndex, 1);
+                    saveFiles();
+                    hideDeleteModal();
+                    showSuccessModal('ลบเอกสารเรียบร้อยแล้ว');
+                }
+            }
         }
 
         // Download attached file
@@ -998,6 +1057,14 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                                     </svg>
                                     Resubmit
+                                </button>
+                            ` : ''}
+                            ${file.uploadedBy === currentUser.username && (file.status === 'in_process' || file.status === 'missing') ? `
+                                <button onclick="confirmDeleteFile(${file.id})" class="mt-2 w-full text-xs px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg transition flex items-center justify-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                    Delete
                                 </button>
                             ` : ''}
                         </td>
