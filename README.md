@@ -956,12 +956,11 @@
             // Filter by user (non-admins only see their files)
             if (currentUser && !currentUser.isAdmin) {
                 filtered = filtered.filter(f => f.uploadedBy === currentUser.username);
-            }
-
-            // Filter by admin department (admins only see files from their department)
-            // Only apply if NOT using department filter dropdown
-            if (currentUser && currentUser.isAdmin && currentUser.department && departmentFilter === 'all') {
-                filtered = filtered.filter(f => f.department === currentUser.department);
+            } else if (currentUser && currentUser.isAdmin) {
+                // Admin sees only their department by default
+                if (departmentFilter === 'all') {
+                    filtered = filtered.filter(f => f.department === currentUser.department);
+                }
             }
 
             // Filter by search term
@@ -1010,13 +1009,26 @@
                 const lastUpdateTime = formatDate(lastUpdate.timestamp);
                 const lastUpdateBy = lastUpdate.updatedBy;
                 
-                const statusSelect = currentUser?.isAdmin ? `
+                // Admin can only edit files from their department
+                const canAdminEdit = currentUser?.isAdmin && currentUser.department === file.department;
+                
+                const statusSelect = canAdminEdit ? `
                     <td class="px-4 py-3">
                         <select onchange="handleStatusChange(${file.id}, this.value)" class="text-sm border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-green-500">
                             ${Object.entries(statusConfig).map(([key, val]) => 
                                 `<option value="${key}" ${file.status === key ? 'selected' : ''}>${val.label}</option>`
                             ).join('')}
                         </select>
+                        <button onclick="confirmDeleteFile(${file.id})" class="mt-2 w-full text-xs px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg transition flex items-center justify-center gap-1">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                            Delete
+                        </button>
+                    </td>
+                ` : currentUser?.isAdmin ? `
+                    <td class="px-4 py-3">
+                        <span class="text-xs text-gray-500 italic">No access</span>
                     </td>
                 ` : '';
 
@@ -1129,7 +1141,15 @@
 
         // Update statistics
         function updateStats() {
-            const userFiles = currentUser?.isAdmin ? files : files.filter(f => f.uploadedBy === currentUser?.username);
+            let userFiles;
+            
+            if (currentUser?.isAdmin) {
+                // Admin only sees files from their department
+                userFiles = files.filter(f => f.department === currentUser.department);
+            } else {
+                // Regular users see their own files
+                userFiles = files.filter(f => f.uploadedBy === currentUser?.username);
+            }
             
             document.getElementById('statTotal').textContent = userFiles.length;
             document.getElementById('statInProcess').textContent = userFiles.filter(f => f.status === 'in_process').length;
